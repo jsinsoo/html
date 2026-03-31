@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정보 3-2. 문제 분해와 모델링 퀴즈</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; max-width: 900px; margin: 20px auto; padding: 20px; background-color: #f0f4f8; }
+        .container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 4px solid #3498db; padding-bottom: 10px; }
+        .user-info { background: #ebf5fb; padding: 20px; border-radius: 10px; margin-bottom: 30px; display: flex; gap: 20px; justify-content: center; }
+        .user-info input { padding: 10px; border: 1px solid #bdc3c7; border-radius: 5px; width: 180px; }
+        .q-card { background: #fff; border: 1px solid #dee2e6; padding: 25px; margin-bottom: 25px; border-radius: 10px; }
+        .q-title { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; color: #34495e; }
+        .options { list-style: none; padding: 0; }
+        .options li { margin: 10px 0; padding: 10px; border-radius: 5px; border: 1px solid #f1f1f1; cursor: pointer; transition: 0.3s; }
+        .options li:hover { background-color: #e8f4fd; }
+        button { display: block; width: 100%; padding: 20px; background: #3498db; color: white; border: none; border-radius: 10px; font-size: 1.2em; font-weight: bold; cursor: pointer; }
+        button:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>3-2. 문제 분해와 모델링 퀴즈</h1>
+    
+    <div class="user-info">
+        <input type="text" id="studentId" placeholder="학번 (예: 30201)">
+        <input type="text" id="studentName" placeholder="이름 (예: 성춘향)">
+    </div>
+
+    <div id="quiz-list"></div>
+
+    <button onclick="saveResult()">제출 및 결과 리포트 다운로드</button>
+</div>
+
+<script>
+    const quizData = [
+        { q: "한 번에 해결하기 어려운 복잡한 문제를 해결 가능한 작은 단위로 나누는 것을 무엇이라 하는가?", a: 1, options: ["문제 분해", "모델링", "알고리즘 설계", "추상화", "자동화"], exp: "복잡한 문제를 해결 가능한 작은 단위의 문제들로 나누는 것을 문제 분해라고 합니다. [1, 2]" },
+        { q: "복잡한 문제를 작은 문제로 분해하여 해결할 때의 장점으로 가장 적절한 것은?", a: 3, options: ["문제의 크기가 더 커진다.", "해결 시간이 무한히 늘어난다.", "해결 가능한 형태가 되어 절차에 따라 풀 수 있다.", "컴퓨터 없이만 해결할 수 있게 된다.", "복잡성이 더 증가한다."], exp: "작은 문제로 분해하면 한 번에 해결할 수 있는 형태가 되며, 문제 해결 절차에 따라 해결할 수 있습니다. [1]" },
+        { q: "가족 여행 계획하기 문제를 분해할 때 포함될 작은 문제가 아닌 것은?", a: 5, options: ["여행지 결정하기", "교통수단 확인하기", "숙소 예약하기", "식당 검색하기", "수학 숙제하기"], exp: "가족 여행 계획은 여행지, 교통, 숙소, 식당 등 여행과 관련된 요소로 분해됩니다. [2]" },
+        { q: "퍼즐 맞추기에서 비슷한 색의 하늘, 나무, 꽃 요소로 나누어 맞추는 분해 방식은?", a: 2, options: ["영역별 분해", "기능이나 자료 기준 분해", "반복적 구조 분해", "무작위 분해", "시간 순서 분해"], exp: "유사한 기능이나 자료(색상, 요소)를 기준으로 분해하여 처리하는 방식입니다. [3, 4]" },
+        { q: "복잡한 문제를 분해할 때 유의해야 할 사항으로 옳은 것은?", a: 4, options: ["작은 문제 사이의 관계는 무시한다.", "문제 분해는 반드시 한 가지 방법만 존재한다.", "작은 문제를 다 풀어도 전체 문제는 해결되지 않는다.", "문제 사이의 순서나 포함 관계에 유의해야 한다.", "오류 확인은 마지막에 한 번만 수행한다."], exp: "문제 사이의 순서나 포함 관계에 유의해야 하며, 작은 문제를 모두 수행했을 때 전체 문제가 해결되는지 확인해야 합니다. [4]" },
+        { q: "작은 문제 사이의 관계를 구조화하여 복잡한 문제를 이해하기 쉬운 형태로 나타내는 것은?", a: 3, options: ["문제 분석", "데이터 수집", "모델링", "코드 작성", "순서도"], exp: "글, 그림, 그래프, 표 등을 사용하여 작은 문제 사이의 관계를 구조화해 단순하게 표현하는 것을 모델링이라고 합니다. [5, 6]" },
+        { q: "다양한 정보를 성격과 특징에 맞게 분류하고 체계적으로 표현하는 모델링의 한 방법은?", a: 1, options: ["정보의 구조화", "정보의 암호화", "정보의 복제", "정보의 삭제", "정보의 분산"], exp: "정보의 구조화는 정보를 성격에 맞게 분류하고 체계적으로 표현하는 모델링의 한 방법입니다. [5]" },
+        { q: "모델링의 도구로 사용되는 것이 아닌 것은?", a: 5, options: ["글", "그림", "그래프", "표", "가상 현실"], exp: "모델링은 주로 글, 그림, 그래프, 표 등을 사용하여 문제를 단순하게 나타냅니다. [5, 6]" },
+        { q: "쾨니히스베르크의 다리 건너기 문제에서 섬과 도시를 단순화하여 나타낸 것을 무엇이라 하는가?", a: 2, options: ["간선", "정점", "흐름선", "루프", "블록"], exp: "오일러의 스케치에서 섬과 도시를 나타내는 점을 정점(Vertex)이라고 합니다. [7]" },
+        { q: "쾨니히스베르크의 다리 건너기 문제에서 다리를 선으로 단순화하여 나타낸 것은?", a: 4, options: ["정점", "노드", "포인터", "간선", "벡터"], exp: "다리를 나타내는 선을 간선(Edge)이라고 합니다. [7]" },
+        { q: "오일러가 증명한 '한붓그리기'가 가능한 경로의 명칭은?", a: 3, options: ["뉴턴 경로", "가우스 경로", "오일러 경로", "피타고라스 경로", "튜링 경로"], exp: "모든 간선을 한 번씩만 지나서 처음 정점으로 돌아오는 경로를 오일러 경로라고 합니다. [8]" },
+        { q: "오일러 경로를 가지기 위한 정점과 간선의 조건은?", a: 1, options: ["각 정점에 연결된 간선의 개수가 모두 짝수여야 함", "각 정점에 연결된 간선의 개수가 모두 홀수여야 함", "정점의 개수가 간선의 개수보다 많아야 함", "모든 간선이 서로 교차해야 함", "중앙 정점이 하나 존재해야 함"], exp: "모든 정점에 연결된 간선의 개수가 짝수여야 펜을 떼지 않고 한 번씩 지나 돌아올 수 있습니다. [8]" },
+        { q: "세 학생의 약속 장소를 정할 때 이동 거리 총합이 최소가 되는 지점을 찾는 모델링 방식은?", a: 4, options: ["이미지 기반 모델링", "표 기반 모델링", "그래프 기반 모델링", "표 및 이미지 기반 모델링", "자연어 기반 모델링"], exp: "가로와 세로 방향으로 나누어 거리 합을 표와 그림으로 구조화하여 해결합니다. [9-11]" },
+        { q: "배차 간격이 다른 세 버스가 다시 동시에 출발하는 시간을 구하는 문제의 핵심 개념은?", a: 2, options: ["최대 공약수", "최소 공배수", "피보나치 수열", "이진 탐색", "정렬"], exp: "8분, 9분, 12분 간격 버스가 동시에 출발하는 시간은 세 숫자의 최소공배수를 구하는 문제입니다. [12-14]" },
+        { q: "계단 오르기 문제(1칸 또는 2칸)에서 다섯 계단을 오르는 방법의 수를 구하기 위해 분해한 작은 문제는?", a: 5, options: ["1개 계단 오르는 법", "2개 계단 오르는 법", "3개 계단 오르는 법", "4개 계단 오르는 법", "위의 모든 문제를 각각 구하는 것"], exp: "1개부터 5개까지 각 계단 수에 따른 방법의 수를 각각 구하는 작은 문제들로 분해합니다. [15]" },
+        { q: "문제 분해 과정에서 동일한 형태의 작은 문제로 나누어 반복적으로 해결하는 방식의 예시는?", a: 1, options: ["그림을 A, B 영역으로 나누어 퍼즐 맞추기", "하늘색 조각만 먼저 골라내기", "여행지 숙소 예약하기", "다리 개수 세기", "버스 번호 확인하기"], exp: "그림을 동일한 형태의 영역(A, B)으로 나누어 반복 처리하는 방식입니다. [3, 4]" },
+        { q: "모델링의 결과로 만들어진 '모델'이 제공하는 정보로 적절하지 않은 것은?", a: 3, options: ["작은 문제들의 구성", "작은 문제들 사이의 관계", "문제 해결에 드는 정확한 현금 비용", "문제를 단순하게 표현한 형태", "문제의 구조적 이해"], exp: "모델은 문제의 구조와 관계를 나타내며, 일반적인 비용 계산을 직접적으로 의미하지는 않습니다. [5]" },
+        { q: "쾨니히스베르크 다리 문제의 모델링이 현대 컴퓨터 과학에서 기초가 된 구조는?", a: 4, options: ["스택 구조", "큐 구조", "트리 구조", "그래프 구조", "배열 구조"], exp: "오일러의 스케치는 현대 그래프 구조의 원형이 되었습니다. [7]" },
+        { q: "문제 상황 분석 시 '현재 상태'와 '목표 상태' 사이의 격차를 줄이기 위해 필요한 것은?", a: 2, options: ["데이터 삭제", "수행 작업(모델링 및 분해)", "무조건적인 기다림", "기존 방식 고수", "컴퓨터 전원 끄기"], exp: "초기 상태에서 목표 상태로 가기 위해 핵심 요소를 추출하고 수행 작업을 정의해야 합니다. [15]" },
+        { q: "다음 중 문제 분해와 모델링에 대한 태도로 가장 바람직한 것은?", a: 1, options: ["적극적으로 구조화하고 표현하려 노력한다.", "어려운 문제는 무조건 남에게 맡긴다.", "복잡한 상태 그대로 해결하려 고집한다.", "모델링은 시간 낭비라고 생각한다.", "한 가지 해결책만 맞다고 주장한다."], exp: "문제를 적극적으로 구조화하고 표현하려는 자세가 필요합니다. [6, 16]" }
+    ];
+
+    const quizList = document.getElementById('quiz-list');
+    quizData.forEach((data, i) => {
+        const card = document.createElement('div');
+        card.className = 'q-card';
+        card.innerHTML = `<div class="q-title">${i+1}. ${data.q}</div>
+            <ul class="options">
+                ${data.options.map((opt, idx) => `<li><input type="radio" name="q${i}" value="${idx+1}"> ${idx+1}) ${opt}</li>`).join('')}
+            </ul>`;
+        quizList.appendChild(card);
+    });
+
+    function saveResult() {
+        const id = document.getElementById('studentId').value;
+        const name = document.getElementById('studentName').value;
+        if(!id || !name) { alert("학번과 이름을 입력해주세요."); return; }
+
+        let score = 0;
+        let report = `[ 3-2. 문제 분해와 모델링 학습 결과 보고서 ]\n학번: ${id}\n이름: ${name}\n\n`;
+        
+        quizData.forEach((data, i) => {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            const userAns = selected ? parseInt(selected.value) : 0;
+            const isCorrect = userAns === data.a;
+            if(isCorrect) score += 5;
+            
+            report += `${i+1}번 문항: ${isCorrect ? "정답 (O)" : "오답 (X)"}\n`;
+            report += `  - 선택한 답: ${userAns === 0 ? "미응답" : userAns + "번"}, 정답: ${data.a}번\n`;
+            report += `  - 상세 풀이: ${data.exp}\n\n`;
+        });
+
+        const now = new Date();
+        const timeStr = now.toLocaleString();
+        report += `--------------------------------\n최종 점수: ${score} / 100\n응시 시각: ${timeStr}`;
+
+        const fileName = `${id}_${name}_${score}_3-2단원_${now.getTime()}.txt`;
+        const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        
+        alert(`제출되었습니다. 점수: ${score}점\n상세 풀이가 포함된 결과 파일이 다운로드됩니다.`);
+    }
+</script>
+</body>
+</html>

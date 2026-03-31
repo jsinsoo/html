@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정보 3-3. 자료형과 변수 퀴즈</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; max-width: 900px; margin: 20px auto; padding: 20px; background-color: #fdfcf0; }
+        .container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 10px solid #f39c12; }
+        h1 { color: #e67e22; text-align: center; border-bottom: 3px solid #f39c12; padding-bottom: 10px; }
+        .user-info { background: #fef5e7; padding: 20px; border-radius: 10px; margin-bottom: 30px; display: flex; gap: 20px; justify-content: center; }
+        .user-info input { padding: 10px; border: 1px solid #f39c12; border-radius: 5px; width: 180px; }
+        .q-card { background: #fff; border: 1px solid #faebcc; padding: 25px; margin-bottom: 25px; border-radius: 10px; }
+        .q-title { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; color: #d35400; }
+        .options { list-style: none; padding: 0; }
+        .options li { margin: 8px 0; padding: 8px; border-radius: 5px; transition: 0.2s; border: 1px solid transparent; }
+        .options li:hover { background-color: #fdf5e6; border-color: #f39c12; }
+        button { display: block; width: 100%; padding: 20px; background: #e67e22; color: white; border: none; border-radius: 10px; font-size: 1.2em; font-weight: bold; cursor: pointer; }
+        button:hover { background: #d35400; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>3-3. 자료형과 변수 퀴즈</h1>
+    
+    <div class="user-info">
+        <input type="text" id="studentId" placeholder="학번 (예: 30301)">
+        <input type="text" id="studentName" placeholder="이름 (예: 성진수)">
+    </div>
+
+    <div id="quiz-list"></div>
+
+    <button onclick="downloadReport()">제출 및 상세 결과 파일 다운로드</button>
+</div>
+
+<script>
+    const quizData = [
+        { q: "파이썬(Python) 언어를 1991년에 개발한 사람은 누구인가?", a: 3, options: ["귀도 반 로섬", "제임스 고슬링", "빌 게이츠", "무함마드 알콰리즈미", "데니스 리치"], exp: "파이썬은 1991년 귀도 반 로섬에 의해 개발되었습니다 [2]." },
+        { q: "모니터 화면에 실행 결과를 출력하기 위해 사용하는 함수는?", a: 1, options: ["print()", "type()", "input()", "bool()", "output()"], exp: "print() 함수는 괄호 안에 작성된 내용을 모니터에 출력하는 기능을 합니다 [3]." },
+        { q: "데이터의 자료형을 확인해 볼 수 있는 파이썬 내장 함수는?", a: 2, options: ["check()", "type()", "class()", "data()", "format()"], exp: "type() 함수를 사용하여 데이터의 자료형을 확인할 수 있습니다 [1]." },
+        { q: "다음 중 파이썬의 기본적인 자료형이 아닌 것은?", a: 5, options: ["수치", "문자열", "불(Boolean)", "실수형", "포인터"], exp: "파이썬의 기본적인 자료형으로는 수치, 문자열, 불 등이 있습니다 [1]." },
+        { q: "파이썬에서 블록(Block)을 구분하기 위해 사용하는 방법은?", a: 4, options: ["중괄호 { }", "세미콜론 ;", "큰따옴표 \" \"", "들여쓰기(Indentation)", "주석 #"], exp: "파이썬에서는 들여쓰기를 사용하여 블록을 구분하며, 잘못된 들여쓰기는 오류를 발생시킵니다 [6]." },
+        { q: "수치 자료형 중 소수점이 포함된 숫자를 의미하는 용어는?", a: 2, options: ["정수형(int)", "실수형(float)", "문자열(str)", "불(bool)", "객체(object)"], exp: "소수점이 포함된 숫자는 실수형(floating-point, float)이라고 합니다 [7, 8]." },
+        { q: "print(type(123))의 실행 결과로 올바른 것은?", a: 1, options: ["<class 'int'>", "<class 'float'>", "<class 'str'>", "<class 'bool'>", "123"], exp: "123은 소수점이 없는 정수이므로 'int' 클래스가 출력됩니다 [8, 9]." },
+        { q: "파이썬에서 문자열을 감싸서 표현할 때 사용하는 기호가 아닌 것은?", a: 4, options: ["작은따옴표 1개", "큰따옴표 1개", "작은따옴표 3개", "물결표(~) 1개", "큰따옴표 3개"], exp: "문자열은 작은따옴표나 큰따옴표 1개 또는 3개로 감싸서 표현합니다 [10]." },
+        { q: "print('2+3')의 실행 결과로 올바른 것은?", a: 3, options: ["5", "5.0", "2+3", "<class 'int'>", "Error"], exp: "따옴표로 감싸진 부분은 문자열로 인식되어 내용 그대로 '2+3'이 출력됩니다 [11]." },
+        { q: "문자열을 여러 번 반복하는 연산을 수행할 때 사용하는 기호는?", a: 4, options: ["+", "-", "/", "*", "**"], exp: "곱셈 기호(*)를 사용하면 문자열을 여러 번 반복하는 연산을 할 수 있습니다 [12]." },
+        { q: "프로그램 수행에 영향을 주지 않으며 설명을 작성할 때 사용하는 기호는?", a: 1, options: ["#", "@", "$", "&", "!"], exp: "파이썬에서는 # 뒤에 작성된 문장을 주석으로 처리하여 실행에서 제외합니다 [12]." },
+        { q: "불(Boolean) 자료형이 가질 수 있는 두 가지 값은?", a: 2, options: ["0과 1", "True와 False", "Yes와 No", "Char와 String", "int와 float"], exp: "불 자료형은 참(True) 또는 거짓(False)의 값만 가질 수 있습니다 [13]." },
+        { q: "True와 False 값을 작성할 때 반드시 지켜야 할 규칙은?", a: 5, options: ["항상 소문자로 쓴다.", "따옴표로 감싸야 한다.", "뒤에 콜론을 붙인다.", "변수명으로만 쓴다.", "첫 번째 글자는 대문자로 쓴다."], exp: "True와 False는 예약어로, 첫 번째 글자는 반드시 대문자로 입력해야 합니다 [13]." },
+        { q: "bool(0)의 결과값으로 올바른 것은?", a: 2, options: ["True", "False", "0", "None", "Error"], exp: "수치 자료형 중 0은 False 값을 가지며, 그 외의 숫자는 True입니다 [13]." },
+        { q: "다음 중 변수명 작성 규칙으로 옳지 않은 것은?", a: 3, options: ["영문자와 한글을 쓸 수 있다.", "대문자와 소문자를 구분한다.", "숫자로 시작할 수 있다.", "공백은 사용할 수 없다.", "예약어는 사용할 수 없다."], exp: "변수명은 숫자로 시작할 수 없습니다 [4]." },
+        { q: "나눗셈을 한 후 '몫'만 구하기 위해 사용하는 연산자는?", a: 2, options: ["/", "//", "%", "**", "&"], exp: "// 기호는 정수 나눗셈의 몫을 구하는 연산자입니다 [5]." },
+        { q: "나눗셈을 한 후 '나머지'를 구하기 위해 사용하는 연산자는?", a: 3, options: ["/", "//", "%", "**", "mod"], exp: "% 기호는 나눗셈의 나머지를 구하는 연산자입니다 [5]." },
+        { q: "두 값이 '같지 않다'를 비교하기 위해 사용하는 연산자는?", a: 5, options: ["==", "=", "><", "!=", "<>"], exp: "!= 연산자는 두 피연산자의 값이 다를 때 True를 반환합니다 [14, 15]." },
+        { q: "두 조건이 모두 True일 때만 결과가 True가 되는 논리 연산자는?", a: 1, options: ["and", "or", "not", "if", "xor"], exp: "and 연산자는 모든 피연산자가 True일 때만 True를 반환합니다 [16, 17]." },
+        { q: "print(not False)의 실행 결과는?", a: 1, options: ["True", "False", "None", "0", "Error"], exp: "not 연산자는 True면 False로, False면 True로 반전시킵니다 [16, 17]." }
+    ];
+
+    const quizList = document.getElementById('quiz-list');
+    quizData.forEach((data, i) => {
+        const card = document.createElement('div');
+        card.className = 'q-card';
+        card.innerHTML = `<div class="q-title">${i+1}. ${data.q}</div>
+            <ul class="options">
+                ${data.options.map((opt, idx) => `<li><input type="radio" name="q${i}" value="${idx+1}"> ${idx+1}) ${opt}</li>`).join('')}
+            </ul>`;
+        quizList.appendChild(card);
+    });
+
+    function downloadReport() {
+        const id = document.getElementById('studentId').value;
+        const name = document.getElementById('studentName').value;
+        if(!id || !name) { alert("학번과 이름을 모두 입력해주세요."); return; }
+
+        let score = 0;
+        let reportText = `[ 3-3. 자료형과 변수 학습 성취도 보고서 ]\n학번: ${id}\n이름: ${name}\n\n`;
+        
+        quizData.forEach((data, i) => {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            const userAns = selected ? parseInt(selected.value) : 0;
+            const isCorrect = userAns === data.a;
+            if(isCorrect) score += 5;
+            
+            reportText += `${i+1}번 문제: ${isCorrect ? "정답 (O)" : "오답 (X)"}\n`;
+            reportText += `  - 나의 선택: ${userAns === 0 ? "미응답" : userAns + "번"}, 실제 정답: ${data.a}번\n`;
+            reportText += `  - 핵심 풀이: ${data.exp}\n\n`;
+        });
+
+        const now = new Date();
+        const timeStr = now.toLocaleString();
+        reportText += `--------------------------------\n최종 점수: ${score} / 100\n응시 시각: ${timeStr}`;
+
+        const fileName = `${id}_${name}_${score}_3-3단원_${now.getTime()}.txt`;
+        const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        
+        alert(`제출이 완료되었습니다. 점수: ${score}점\n상세 풀이가 담긴 결과 파일(${fileName})을 확인하세요.`);
+    }
+</script>
+</body>
+</html>
