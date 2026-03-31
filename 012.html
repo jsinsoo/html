@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정보 1-2. 사물 인터넷과 사회 변화 퀴즈</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; max-width: 900px; margin: 20px auto; padding: 20px; background-color: #f0f2f5; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { color: #1a73e8; text-align: center; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; }
+        .input-group { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; display: flex; gap: 20px; justify-content: center; align-items: center; }
+        .input-group input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .question { margin-bottom: 40px; padding: 20px; border: 1px solid #eee; border-radius: 8px; }
+        .question p { font-weight: bold; font-size: 1.1em; color: #333; }
+        .options { list-style: none; padding: 0; }
+        .options li { margin: 10px 0; padding: 8px; transition: background 0.2s; }
+        .options li:hover { background: #f1f3f4; }
+        button { display: block; width: 100%; padding: 18px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 30px; }
+        button:hover { background: #1557b0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>1-2. 사물 인터넷과 사회 변화 퀴즈</h1>
+    
+    <div class="input-group">
+        <div>학번: <input type="text" id="studentId" placeholder="예: 10101"></div>
+        <div>이름: <input type="text" id="studentName" placeholder="예: 홍길동"></div>
+    </div>
+
+    <div id="quiz-container">
+        <!-- 스크립트에서 문제 생성 -->
+    </div>
+
+    <button onclick="submitQuiz()">제출 및 결과 리포트 다운로드</button>
+</div>
+
+<script>
+    const questions = [
+        { q: "사물 인터넷(IoT)에 대한 설명으로 옳은 것은?", a: 2, options: ["기계와 기계만 연결하는 기술이다.", "사물, 사람 등이 연결되어 상호 작용하는 정보 과학 기술이다.", "반드시 유선 네트워크로만 연결되어야 한다.", "사람의 개입이 필수적으로 수반되어야 동작한다.", "데이터 수집 기능은 포함되지 않는다."], exp: "사물 인터넷은 사물과 사물뿐만 아니라 사물과 사람, 사람과 사람을 연결하여 상호 작용하게 합니다 [1, 2]." },
+        { q: "사물 인터넷 시스템의 구성 요소 중 '모터, 밸브, 스위치' 등이 속하는 항목은?", a: 3, options: ["센서", "통신 기술", "액추에이터", "소프트웨어", "인공지능"], exp: "액추에이터는 모터, 밸브, 스위치 등을 포함하여 물리적인 동작을 수행합니다 [3]." },
+        { q: "사물 인터넷과 인공지능 기술이 융합되어 사물 간 지능형 정보 통신이 가능해진 개념은?", a: 1, options: ["AIoT", "Big Data", "Edge Computing", "Cloud Computing", "NFC"], exp: "인공지능과 사물 인터넷이 결합된 개념을 지능형 사물 인터넷(AIoT)이라고 합니다 [1]." },
+        { q: "데이터가 생성되는 주변에서 분산형 방식으로 데이터를 처리하여 처리 시간을 단축하는 기술은?", a: 4, options: ["클라우드 컴퓨팅", "중앙 집중형 처리", "게이트웨이 시스템", "에지 컴퓨팅", "RFID 리더 시스템"], exp: "에지 컴퓨팅은 데이터 생성지 주변에서 처리하여 처리 시간을 단축하고 대역폭 사용을 줄입니다 [1, 3]." },
+        { q: "스마트홈에서 수집된 데이터가 스마트폰이나 플랫폼으로 이동할 때 거치는 핵심 장치는?", a: 5, options: ["액추에이터", "스피커", "온도 센서", "조도 센서", "게이트웨이"], exp: "스마트홈에서 수집된 데이터는 게이트웨이를 통해 외부 장치나 플랫폼으로 전달됩니다 [4]." },
+        { q: "체험형 놀이 시설에서 입장객 정보를 관리하기 위해 주로 활용되는 통신 기술은?", a: 2, options: ["블루투스", "RFID/NFC", "이더넷", "5G 셀룰러", "광케이블"], exp: "놀이 시설 등에서는 RFID, NFC 기반 통신과 웨어러블 밴드를 사용하여 정보를 관리합니다 [5]." },
+        { q: "기존 교통 시스템과 달리 양방향 통신으로 위험 정보를 실시간 제공하는 시스템은?", a: 3, options: ["단방향 정보 시스템", "CCTV 감시 시스템", "차세대 지능형 교통 시스템", "GPS 네비게이션", "불법 주정차 단속 시스템"], exp: "차세대 지능형 교통 시스템은 차량 간, 차량과 인프라 간 양방향 통신을 지원합니다 [6]." },
+        { q: "경상북도 상주시에서 독거노인 보호를 위해 활용한 사물 인터넷 기술의 사례는?", a: 1, options: ["위급 상황 시 자동 알림 메시지 전송", "무료 와이파이 보급", "스마트 냉장고 보급", "불법 주정차 단속", "스마트 농작물 관리"], exp: "상주시는 독거노인 생활 데이터를 분석하여 위급 시 관리자에게 알림을 전송하는 시스템을 운영합니다 [7]." },
+        { q: "서울시 관악구에서 불법 주정차 예방을 위해 사물 인터넷과 접목한 기술은?", a: 4, options: ["스마트 그리드", "드론 배송", "6G 통신", "태양광 LED 전광판", "얼굴 인식 카메라"], exp: "관악구는 사물 인터넷과 태양광 LED 기술을 접목하여 불법 주정차 예방 시스템을 구축했습니다 [8]." },
+        { q: "자신의 데이터가 언제, 어디서, 어떻게 사용될지를 결정할 수 있는 권리를 무엇이라 하는가?", a: 5, options: ["데이터 복지권", "정보 접근권", "통신 자유권", "데이터 소유권", "데이터 주권"], exp: "개인 정보 주체로서 자신의 정보 관리와 보호를 결정하는 권리를 '데이터 주권'이라 합니다 [9]." },
+        { q: "컴퓨팅 시스템에 불법적으로 접근하거나 허가받지 않은 작업을 수행하는 행위는?", a: 2, options: ["페어링", "해킹", "랜섬웨어", "태스크포스", "필터링"], exp: "불법적인 시스템 접근 및 허가받지 않은 모든 작업을 '해킹'이라고 정의합니다 [9]." },
+        { q: "컴퓨터 시스템을 감염시켜 접근을 제한하고 대가를 요구하는 악성 소프트웨어는?", a: 3, options: ["스파이웨어", "에드웨어", "랜섬웨어", "웜 바이러스", "트로이 목마"], exp: "시스템 접근을 제한하고 대가를 요구하는 소프트웨어는 랜섬웨어입니다 [10]." },
+        { q: "스마트 농업 시스템에서 센서가 측정하는 항목으로 적절하지 않은 것은?", a: 5, options: ["토양 습도", "온도", "영양 상태", "일조량", "농작물 판매가"], exp: "스마트 센서는 주로 습도, 온도, 영양 상태 등 환경 데이터를 측정합니다 [11]." },
+        { q: "사물 인터넷 장치가 2025년경 전 세계적으로 몇 개 이상 연결될 것으로 예상되는가?", a: 4, options: ["10억 개", "100억 개", "200억 개", "300억 개", "1조 개"], exp: "IoT 애널리틱스에 따르면 2025년 전 세계 300억 개 이상의 IoT 장치가 연결될 전망입니다 [12]." },
+        { q: "스마트 냉장고 시스템에서 식품의 유통 기한을 관리하기 위해 부착하는 것은?", a: 1, options: ["RFID 태그", "액추에이터", "스피커", "습도 센서", "리튬 배터리"], exp: "식품에 부착된 RFID 태그를 통해 제품 정보를 인식하고 유통 기한을 관리할 수 있습니다 [13, 14]." },
+        { q: "6G 통신 기술의 특징으로 가장 적절한 것은?", a: 3, options: ["느린 전송 속도", "높은 지연 시간", "초고속 및 초저지연 통신", "유선 전용 기술", "지상 기지국만 활용"], exp: "6G의 핵심은 초고속 데이터 전송과 나노 초 단위의 초저지연 통신입니다 [15]." },
+        { q: "사물 인터넷 기술 활용 시 보안 사고 예방을 위해 반드시 필요한 것은?", a: 2, options: ["데이터 공개 범위 확대", "정기적인 보안 업데이트와 암호화", "모든 기기의 비밀번호 해제", "외부망과의 완전한 차단", "고유 IP 주소의 삭제"], exp: "보안 유의를 위해 정기적인 보안 업데이트와 데이터 암호화가 필수적입니다 [16]." },
+        { q: "다음 중 사물 인터넷 시스템의 '센서'에 해당하는 장치는?", a: 4, options: ["모터", "벨브", "스피커", "가속도 센서", "디스플레이"], exp: "센서에는 온도, 습도, 가속도, 초음파 센서 등이 포함됩니다 [3]." },
+        { q: "사물 인터넷 기술이 가져올 미래 사회의 모습으로 적절한 단어는?", a: 1, options: ["초연결 사회", "아날로그 사회", "단방향 통신 사회", "수동 제어 사회", "오프라인 전용 사회"], exp: "사물 인터넷은 다양한 사물과 사람이 연결되는 초연결 사회를 만듭니다 [7]." },
+        { q: "국가적 차원에서 사이버 위협에 대처하기 위해 별도로 조직하는 임시 조직은?", a: 2, options: ["유통 위원회", "태스크포스(TF)", "보안 협회", "정보 연합체", "데이터 관리소"], exp: "특정 목적(보안 위협 대응 등)을 달성하기 위한 임시 조직을 태스크포스(TF)라고 합니다 [10]." }
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+    questions.forEach((item, index) => {
+        let qDiv = document.createElement('div');
+        qDiv.className = 'question';
+        let optionsHtml = item.options.map((opt, i) => 
+            `<li><input type="radio" name="q${index}" value="${i+1}"> ${i+1}) ${opt}</li>`
+        ).join('');
+        qDiv.innerHTML = `<p>${index + 1}. ${item.q}</p><ul class="options">${optionsHtml}</ul>`;
+        quizContainer.appendChild(qDiv);
+    });
+
+    function submitQuiz() {
+        const sId = document.getElementById('studentId').value;
+        const sName = document.getElementById('studentName').value;
+        if(!sId || !sName) { alert("학번과 이름을 모두 입력해주세요."); return; }
+
+        let score = 0;
+        let report = `[ 1-2. 사물 인터넷과 사회 변화 응시 리포트 ]\n`;
+        report += `학번: ${sId} / 이름: ${sName}\n`;
+        const now = new Date();
+        const timeStr = now.toLocaleString();
+
+        questions.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            const userAns = selected ? selected.value : "미응답";
+            const isCorrect = userAns == item.a;
+            if(isCorrect) score += 5;
+            
+            report += `\n${index + 1}번 문제: ${isCorrect ? "[O] 정답" : "[X] 오답"}\n`;
+            report += `   - 제출한 답: ${userAns}번 / 정답: ${item.a}번\n`;
+            report += `   - 상세 풀이: ${item.exp}\n`;
+        });
+
+        report += `\n--------------------------------------\n`;
+        report += `최종 점수: ${score} / 100\n`;
+        report += `응시 시각: ${timeStr}\n`;
+
+        const fileName = `${sId}_${sName}_${score}_1-2단원_${now.getTime()}.txt`;
+        const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        
+        alert(`${sName}님, 제출 완료!\n점수: ${score}점\n결과 파일(${fileName})이 생성되었습니다.`);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정보 2-1. 암호화와 데이터의 보호 퀴즈</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; max-width: 900px; margin: 20px auto; padding: 20px; background-color: #f8fafc; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #1e293b; text-align: center; border-bottom: 3px solid #3b82f6; padding-bottom: 15px; }
+        .info-section { background: #f1f5f9; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center; }
+        .info-section input { padding: 10px; margin: 5px; border: 1px solid #cbd5e1; border-radius: 4px; width: 180px; }
+        .question-card { margin-bottom: 30px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
+        .q-text { font-weight: bold; font-size: 1.1em; color: #334155; margin-bottom: 15px; }
+        .options { list-style: none; padding: 0; }
+        .options li { margin: 10px 0; padding: 10px; border-radius: 4px; background: #fdfdfd; border: 1px solid #f1f5f9; }
+        .options label { cursor: pointer; display: block; }
+        .btn-submit { display: block; width: 100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-submit:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>2-1. 암호화와 데이터의 보호 퀴즈</h1>
+    
+    <div class="info-section">
+        <strong>학번:</strong> <input type="text" id="studentId" placeholder="예: 20401">
+        <strong>이름:</strong> <input type="text" id="studentName" placeholder="홍길동">
+    </div>
+
+    <div id="quiz-container"></div>
+    
+    <button class="btn-submit" onclick="generateReport()">제출 및 결과 파일 생성</button>
+</div>
+
+<script>
+const quizData = [
+    { q: "암호화(Encryption)의 정의로 가장 적절한 것은?", a: 2, c: ["원본 메시지를 누구나 읽을 수 있게 공개하는 것", "암호키를 사용하여 평문을 암호문으로 변환하는 것", "비밀번호를 입력하여 로그인을 시도하는 것", "데이터의 용량을 줄이기 위해 압축하는 것", "이미지 파일의 해상도를 높이는 것"], e: "암호화는 암호키를 사용하여 원본 메시지(평문)를 암호문으로 변환하는 과정입니다 [1, 2]." },
+    { q: "2차 세계 대전 당시 독일군이 사용했던 치환 방식의 암호화 장치 이름은?", a: 4, c: ["에디슨", "튜링 머신", "알고리즘", "에니그마", "SSL"], e: "독일군은 에니그마(Enigma)라는 장치를 이용하여 알파벳을 치환하는 방식으로 통신을 보호했습니다 [1]." },
+    { q: "암호화되기 전의 원본 메시지를 뜻하는 용어는?", a: 1, c: ["평문(Plaintext)", "암호문(Ciphertext)", "암호키(Key)", "복호문", "로그"], e: "암호화되기 전의 원본 메시지는 평문(Plaintext)이라고 합니다 [2]." },
+    { q: "암호문을 다시 원본 메시지로 되돌리는 과정을 무엇이라 하는가?", a: 3, c: ["암호화", "압축", "복호화(Decryption)", "인코딩", "전치"], e: "암호문을 원본 메시지로 되돌리는 과정은 복호화(Decryption)입니다 [2]." },
+    { q: "허가된 사용자와 그렇지 않은 사용자를 구분하기 위해 암호화에 사용하는 비밀 정보는?", a: 5, c: ["아이디", "쿠키", "인증서", "프로토콜", "암호키(Encryption Key)"], e: "암호키는 허가된 사용자를 구분하고 암호를 해독하는 데 필요한 중요한 '열쇠'입니다 [2, 3]." },
+    { q: "데이터가 전송/저장 과정에서 허가 없이 변경되거나 손상되지 않았음을 의미하는 보안 용어는?", a: 2, c: ["기밀성(Confidentiality)", "무결성(Integrity)", "가용성", "복잡성", "휘발성"], e: "무결성은 데이터가 전송되고 저장되는 모든 과정에서 변경되거나 손상되지 않는 것을 의미합니다 [4]." },
+    { q: "허가받지 않은 개인이나 시스템이 데이터에 접근할 수 없도록 보호하는 성질은?", a: 1, c: ["기밀성(Confidentiality)", "무결성", "신뢰성", "연속성", "투명성"], e: "기밀성은 허가받지 않은 대상이 데이터에 접근할 수 없도록 하여 비밀성을 유지하는 것입니다 [4, 5]." },
+    { q: "개인 정보 보호법에 따라 암호화하지 않고 평문으로 저장했을 때 제재를 받을 수 있는 정보는?", a: 4, c: ["좋아하는 색상", "웹사이트 방문 기록", "오늘의 날씨", "주민등록번호", "사용자 닉네임"], e: "주민등록번호와 같은 고유 식별 정보를 암호화하지 않고 평문으로 저장하면 법적 제재를 받습니다 [4, 5]." },
+    { q: "은행 거래 시 사용하는 일회용 비밀번호의 약칭은?", a: 3, c: ["SSL", "URL", "OTP", "HTTP", "API"], e: "은행 거래 시 보안을 위해 사용되는 일회용 비밀번호는 OTP(One-Time Password)입니다 [6]." },
+    { q: "웹 사이트 주소가 'https://'로 시작한다면 어떤 기술이 적용된 것인가?", a: 2, c: ["데이터 압축 기술", "SSL(Secure Sockets Layer) 인증서", "전치형 암호화", "에니그마 알고리즘", "이미지 필터 기술"], e: "HTTPS는 SSL 인증서를 통해 서버와 사용자 간의 통신이 암호화된 안전한 연결임을 나타냅니다 [6]." },
+    { q: "치환형 암호 기법(Substitution Cipher)의 특징으로 옳은 것은?", a: 1, c: ["평문의 문자를 규칙에 따라 다른 문자로 바꾸는 방식", "문자의 위치만 재배치하는 방식", "모든 문자를 숫자로만 변환하는 방식", "데이터의 길이를 무조건 줄이는 방식", "원본 메시지를 완전히 삭제하는 방식"], e: "치환형 암호 기법은 원본 메시지의 문자들을 규칙에 따라 다른 문자로 바꾸어 암호문을 만듭니다 [7]." },
+    { q: "전치형 암호 기법(Transposition Cipher)의 특징으로 옳은 것은?", a: 2, c: ["알파벳을 다른 알파벳으로 교체한다.", "원본 메시지의 문자 배열 순서를 바꾼다.", "중복된 문자를 하나로 합친다.", "암호키 없이도 완벽히 복구 가능하다.", "파일의 확장자를 변경한다."], e: "전치형 암호 기법은 원본 메시지의 문자 배열을 특정한 규칙(암호키)에 따라 재배치합니다 [8]." },
+    { q: "알파벳 총 26개 중 13개 뒤의 알파벳으로 치환하는 방식(ROT13)에서 'HELLO'의 암호문은?", a: 4, c: ["IFMMP", "GDKKN", "WORLD", "URYYB", "KHOOR"], e: "H→U, E→R, L→Y, O→B로 13칸씩 이동하면 'URYYB'가 됩니다 [3, 9]." },
+    { q: "시저(Caesar) 암호에서 '3문자 뒤의 알파벳'으로 치환할 때, 평문 'A'는 무엇으로 변하는가?", a: 3, c: ["B", "C", "D", "E", "F"], e: "A에서 3칸 뒤인 B, C, D 순서에 따라 D로 치환됩니다 [8]." },
+    { q: "전치형 암호화 시 평문의 길이가 암호키의 배수가 아닐 때 처리 방법은?", a: 5, c: ["남는 부분을 삭제한다.", "암호화를 중단한다.", "암호키를 줄인다.", "중복된 문자를 넣는다.", "임의의 문자(예: z)를 덧붙여 길이를 맞춘다."], e: "평문 길이가 모자라면 임의의 문자(Dummy)를 덧붙여 암호키 길이에 맞추어 나눕니다 [10]." },
+    { q: "암호판을 사용하여 안쪽 판을 왼쪽으로 3칸 회전시켰을 때, 바깥쪽 'A'에 대응하는 안쪽 문자는?", a: 4, c: ["A", "B", "C", "D", "E"], e: "안쪽 판을 왼쪽으로 3칸 회전하면 A는 D와 마주하게 됩니다 [11, 12]." },
+    { q: "암호화의 중요성에 대한 설명으로 옳지 않은 것은?", a: 5, c: ["개인 금융 정보를 보호한다.", "사생활 침해 피해를 최소화한다.", "데이터의 기밀성과 무결성을 보장한다.", "사이버 범죄로부터 데이터를 안전하게 지킨다.", "모든 데이터를 누구나 볼 수 있게 공개하기 위함이다."], e: "암호화는 허가되지 않은 사용자가 데이터에 접근하는 것을 방지하기 위해 수행합니다 [2, 4]." },
+    { q: "브라우저 주소창의 자물쇠 아이콘이 의미하는 것은?", a: 1, c: ["해당 사이트가 SSL 인증서로 보호되고 있음", "비밀번호가 틀렸음", "컴퓨터에 바이러스가 있음", "인터넷 연결이 끊겼음", "현재 페이지가 캡처 금지임"], e: "자물쇠 아이콘은 SSL 인증서를 통해 안전한 웹 사이트임을 나타냅니다 [6]." },
+    { q: "전치형 암호화 알고리즘에서 암호키가 '3-1-4-5-2'일 때, 첫 번째로 오는 문자는 원본의 몇 번째 문자인가?", a: 3, c: ["1번째", "2번째", "3번째", "4번째", "5번째"], e: "암호키의 첫 번째 숫자가 3이므로, 원본의 세 번째 문자가 암호문의 첫 번째 위치로 옵니다 [10]." },
+    { q: "복호화 시 반드시 필요한 요소는?", a: 2, c: ["대용량 하드디스크", "올바른 암호키", "고성능 그래픽카드", "압축 해제 프로그램", "인터넷 브라우저"], e: "암호화에 사용된 암호키 값을 알아야만 원본 메시지로 해독(복호화)할 수 있습니다 [2]." }
+];
+
+function loadQuiz() {
+    const container = document.getElementById('quiz-container');
+    quizData.forEach((item, idx) => {
+        let optHtml = '';
+        item.c.forEach((choice, i) => {
+            optHtml += `<li><label><input type="radio" name="q${idx}" value="${i + 1}"> ${i + 1}) ${choice}</label></li>`;
+        });
+        container.innerHTML += `
+            <div class="question-card">
+                <p class="q-text">Q${idx + 1}. ${item.q}</p>
+                <ul class="options">${optHtml}</ul>
+            </div>`;
+    });
+}
+
+function generateReport() {
+    const sId = document.getElementById('studentId').value.trim();
+    const sName = document.getElementById('studentName').value.trim();
+    
+    if (!sId || !sName) {
+        alert("학번과 이름을 입력해주세요.");
+        return;
+    }
+
+    let score = 0;
+    let detailRows = "";
+
+    quizData.forEach((item, idx) => {
+        const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+        const userAns = selected ? parseInt(selected.value) : 0;
+        const isCorrect = userAns === item.a;
+        if (isCorrect) score += 5;
+
+        detailRows += `Q${idx + 1}. ${isCorrect ? '[정답]' : '[오답]'}\n`;
+        detailRows += ` - 학생 답: ${userAns === 0 ? '미응시' : userAns}\n`;
+        detailRows += ` - 실제 정답: ${item.a}\n`;
+        detailRows += ` - 상세 풀이: ${item.e}\n\n`;
+    });
+
+    const now = new Date();
+    const timestamp = now.getFullYear() + 
+                      String(now.getMonth()+1).padStart(2,'0') + 
+                      String(now.getDate()).padStart(2,'0') + "_" +
+                      String(now.getHours()).padStart(2,'0') + 
+                      String(now.getMinutes()).padStart(2,'0');
+
+    const finalReport = `=== 데이터 시각화 퀴즈 결과 보고서 ===\n` +
+                        `학번: ${sId}\n이름: ${sName}\n` +
+                        `최종 점수: ${score}점 / 100점\n` +
+                        `--------------------------------------\n\n` +
+                        detailRows;
+
+    const fileName = `${sId}_${sName}_${score}점_2-4단원_${timestamp}.txt`;
+    const blob = new Blob([finalReport], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+
+    alert(`퀴즈가 제출되었습니다!\n점수: ${score}점\n결과 파일(${fileName})이 저장되었습니다.`);
+}
+
+window.onload = loadQuiz;
+</script>
+</body>
+</html>

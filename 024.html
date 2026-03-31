@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정보 2-4. 데이터 시각화 퀴즈</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; max-width: 900px; margin: 20px auto; padding: 20px; background-color: #f8fafc; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #1e293b; text-align: center; border-bottom: 3px solid #3b82f6; padding-bottom: 15px; }
+        .info-section { background: #f1f5f9; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center; }
+        .info-section input { padding: 10px; margin: 5px; border: 1px solid #cbd5e1; border-radius: 4px; width: 180px; }
+        .question-card { margin-bottom: 30px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
+        .q-text { font-weight: bold; font-size: 1.1em; color: #334155; margin-bottom: 15px; }
+        .options { list-style: none; padding: 0; }
+        .options li { margin: 10px 0; padding: 10px; border-radius: 4px; background: #fdfdfd; border: 1px solid #f1f5f9; }
+        .options label { cursor: pointer; display: block; }
+        .btn-submit { display: block; width: 100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-submit:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>2-4. 데이터 시각화 퀴즈</h1>
+    
+    <div class="info-section">
+        <strong>학번:</strong> <input type="text" id="studentId" placeholder="예: 20401">
+        <strong>이름:</strong> <input type="text" id="studentName" placeholder="홍길동">
+    </div>
+
+    <div id="quiz-container"></div>
+    
+    <button class="btn-submit" onclick="generateReport()">제출 및 결과 파일 생성</button>
+</div>
+
+<script>
+const quizData = [
+    { q: "데이터 시각화의 정의로 가장 적절한 것은?", a: 3, c: ["데이터를 암호화하여 보호하는 것", "데이터의 용량을 줄이기 위해 압축하는 것", "수치나 통계 데이터를 도표, 그래프, 지도 등 시각적 형태로 표현하는 것", "데이터를 표 형태로만 나열하는 것", "데이터를 서버에 저장하는 과정"], e: "데이터 시각화는 수치나 통계 데이터를 도표, 그래프, 지도 등 시각적 형태로 표현하는 것을 의미합니다. [1, 2]" },
+    { q: "데이터 시각화의 의의에 대한 설명으로 옳지 않은 것은?", a: 5, c: ["데이터의 의미를 명료하게 파악할 수 있다.", "데이터의 분포, 트렌드, 이상치를 쉽게 전달한다.", "데이터 간의 관계와 추세를 확인할 수 있다.", "데이터 기반의 효과적인 의사 결정을 돕는다.", "데이터의 원본 수치를 하나하나 정밀하게 외우기 위해 사용한다."], e: "시각화는 데이터의 의미를 한눈에 파악하고 의사 결정을 돕는 것이 목적이지, 모든 수치를 암기하기 위한 수단이 아닙니다. [1]" },
+    { q: "1854년 존 스노(John Snow)가 콜레라 감염 원인이 물이라는 것을 밝혀낼 때 사용한 시각화 방법은?", a: 2, c: ["원 그래프", "환자의 집 위치를 표시한 지도", "기온 변화 선 그래프", "막대 그래프", "히스토그램"], e: "존 스노는 콜레라 환자의 집 위치를 지도에 표시하여 펌프를 중심으로 환자가 밀집되어 있음을 확인했습니다. [3]" },
+    { q: "연속적인 데이터의 흐름을 확인하거나 시간에 따른 값의 변화를 파악하기에 가장 유용한 시각화 방법은?", a: 1, c: ["선 그래프", "막대 그래프", "원 그래프", "히스토그램", "산점도"], e: "선 그래프는 점을 선으로 연결하여 연속적인 데이터의 흐름과 시간적 변화를 파악하는 데 효과적입니다. [4]" },
+    { q: "여러 항목의 값을 상대적으로 비교하거나 어떤 값이 가장 크고 작은지 파악하기에 적합한 그래프는?", a: 2, c: ["선 그래프", "막대 그래프", "원 그래프", "산점도", "박스 플롯"], e: "막대 그래프는 막대 모양의 길이를 통해 값의 크기를 시각화하여 상대적 비교에 유용합니다. [4, 5]" },
+    { q: "전체에서 각 항목이 차지하는 비율을 파악할 때 가장 많이 쓰이는 그래프는?", a: 3, c: ["히스토그램", "산점도", "원 그래프", "막대 그래프", "선 그래프"], e: "원 그래프는 전체에 대한 각 항목의 비율을 영역의 크기로 나타낼 때 효과적입니다. [6]" },
+    { q: "구간을 나누어 데이터의 전반적인 분포와 구간 내 빈도수를 시각화하는 그래프는?", a: 4, c: ["선 그래프", "원 그래프", "산점도", "히스토그램", "막대 그래프"], e: "히스토그램은 가로축에 값의 구간을, 세로축에 빈도수를 표현하여 값의 분포를 파악하는 데 쓰입니다. [6]" },
+    { q: "두 속성값 사이의 관계나 상관관계를 시각화할 때 자주 사용되는 그래프는?", a: 5, c: ["막대 그래프", "선 그래프", "원 그래프", "히스토그램", "산점도"], e: "산점도는 좌표 평면에 두 속성값의 관계를 점으로 나타내어 상관관계를 파악할 때 사용됩니다. [7, 8]" },
+    { q: "복잡한 데이터를 시각화하여 정보를 빠르고 명확하게 전달하는 '정보+그래픽'의 합성어는?", a: 1, c: ["인포그래픽", "빅데이터", "알고리즘", "데이터 댐", "디지털 트윈"], e: "인포그래픽은 Information과 Graphic의 합성어로, 정보를 시각적인 형태로 전달하는 디자인입니다. [4]" },
+    { q: "숫자로 표현할 수 있는 데이터로 온도, 점수, 나이, 키 등이 해당하는 것은?", a: 3, c: ["범주형 데이터", "로그 데이터", "수치형 데이터", "이미지 데이터", "비정형 데이터"], e: "온도, 점수 등 숫자로 표현 가능한 데이터를 수치형 데이터라고 합니다. [7]" },
+    { q: "성별, 혈액형과 같이 일정한 범주로 나눌 수 있는 데이터는?", a: 1, c: ["범주형 데이터", "수치형 데이터", "연속형 데이터", "시계열 데이터", "공공 데이터"], e: "성별, 혈액형 등 특성에 따라 분류되는 데이터를 범주형 데이터라고 합니다. [7]" },
+    { q: "두 속성 간의 관련 정도를 나타내며 -1에서 1 사이의 값을 가지는 지표는?", a: 2, c: ["중앙값", "상관계수", "평균값", "사분위수", "분산"], e: "두 속성 간의 관련 정도는 상관계수(r)로 나타내며, 절댓값이 1에 가까울수록 관련성이 큽니다. [7]" },
+    { q: "데이터의 중앙값, 사분위수, 이상치를 한눈에 확인할 수 있는 시각화 도구는?", a: 4, c: ["선 그래프", "히스토그램", "원 그래프", "박스 플롯", "산점도"], e: "박스 플롯은 성적 분포, 중앙값, 사분위수 및 이상치를 확인하기에 적합합니다. [9]" },
+    { q: "다음 중 빅데이터 분석을 위한 '데이터 플랫폼' 사례로 옳은 것은?", a: 3, c: ["파이썬", "오렌지3", "기상자료개방포털", "R", "코댑"], e: "기상자료개방포털, 공공 데이터 포털, 네이버 데이터랩 등은 대표적인 데이터 플랫폼입니다. [9-11]" },
+    { q: "코딩을 하지 않고도 데이터 분석을 할 수 있는 응용 소프트웨어에 해당하는 것은?", a: 5, c: ["파이썬", "R", "SQL", "자바", "코댑(CODAP)"], e: "코댑(CODAP)이나 오렌지3(Orange3)은 코딩 없이 분석이 가능한 응용 소프트웨어입니다. [9, 10]" },
+    { q: "빅데이터 분석에 사용되는 대표적인 프로그래밍 언어 두 가지는?", a: 2, c: ["HTML, CSS", "파이썬, R", "C++, 자바", "PHP, 루비", "Swift, 코틀린"], e: "파이썬(Python)과 R은 데이터 분석에 널리 쓰이는 프로그래밍 언어입니다. [9, 11]" },
+    { q: "스프레드시트에서 외부 CSV 데이터를 가져올 때 '구분자 유형'으로 주로 설정하는 것은?", a: 1, c: ["쉼표", "마침표", "물음표", "골뱅이", "해시태그"], e: "대부분의 데이터 파일은 값들이 쉼표로 구분되어 있으므로 구분자를 쉼표로 설정합니다. [12, 13]" },
+    { q: "기후 데이터를 시각화하여 분석함으로써 얻을 수 있는 가치로 옳지 않은 것은?", a: 4, c: ["과거 현상 분석을 통한 미래 예측", "비판적 시각을 통한 사실 여부 판단", "관심 지역에 대한 정보 습득", "데이터 수정을 통한 원하는 결과 조작", "공공의 이익을 위한 재난 예방"], e: "데이터 시각화의 가치는 객관적 분석을 통한 예측과 예방이지, 데이터의 조작이 아닙니다. [2, 14, 15]" },
+    { q: "시각화 방법 선택 시 고려해야 할 요소가 아닌 것은?", a: 5, c: ["데이터의 성격(수치형/범주형)", "해결하고자 하는 문제의 정의", "대상의 특성", "전달하고자 하는 핵심 의미", "데이터의 생성 날짜 요일"], e: "시각화 방법은 데이터의 성격과 해결하려는 문제에 따라 결정되어야 합니다. [2]" },
+    { q: "데이터 시각화 시 효과적인 표현을 위해 활용하는 시각적 요소가 아닌 것은?", a: 3, c: ["도형과 색상", "길이와 너비", "데이터의 암호키", "방향과 위치", "영역의 크기"], e: "시각화는 도형, 방향, 길이, 너비, 색상, 위치 등의 요소를 활용하여 표현합니다. [4]" }
+];
+
+function loadQuiz() {
+    const container = document.getElementById('quiz-container');
+    quizData.forEach((item, idx) => {
+        let optHtml = '';
+        item.c.forEach((choice, i) => {
+            optHtml += `<li><label><input type="radio" name="q${idx}" value="${i + 1}"> ${i + 1}) ${choice}</label></li>`;
+        });
+        container.innerHTML += `
+            <div class="question-card">
+                <p class="q-text">Q${idx + 1}. ${item.q}</p>
+                <ul class="options">${optHtml}</ul>
+            </div>`;
+    });
+}
+
+function generateReport() {
+    const sId = document.getElementById('studentId').value.trim();
+    const sName = document.getElementById('studentName').value.trim();
+    
+    if (!sId || !sName) {
+        alert("학번과 이름을 입력해주세요.");
+        return;
+    }
+
+    let score = 0;
+    let detailRows = "";
+
+    quizData.forEach((item, idx) => {
+        const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+        const userAns = selected ? parseInt(selected.value) : 0;
+        const isCorrect = userAns === item.a;
+        if (isCorrect) score += 5;
+
+        detailRows += `Q${idx + 1}. ${isCorrect ? '[정답]' : '[오답]'}\n`;
+        detailRows += ` - 학생 답: ${userAns === 0 ? '미응시' : userAns}\n`;
+        detailRows += ` - 실제 정답: ${item.a}\n`;
+        detailRows += ` - 상세 풀이: ${item.e}\n\n`;
+    });
+
+    const now = new Date();
+    const timestamp = now.getFullYear() + 
+                      String(now.getMonth()+1).padStart(2,'0') + 
+                      String(now.getDate()).padStart(2,'0') + "_" +
+                      String(now.getHours()).padStart(2,'0') + 
+                      String(now.getMinutes()).padStart(2,'0');
+
+    const finalReport = `=== 데이터 시각화 퀴즈 결과 보고서 ===\n` +
+                        `학번: ${sId}\n이름: ${sName}\n` +
+                        `최종 점수: ${score}점 / 100점\n` +
+                        `--------------------------------------\n\n` +
+                        detailRows;
+
+    const fileName = `${sId}_${sName}_${score}점_2-4단원_${timestamp}.txt`;
+    const blob = new Blob([finalReport], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+
+    alert(`퀴즈가 제출되었습니다!\n점수: ${score}점\n결과 파일(${fileName})이 저장되었습니다.`);
+}
+
+window.onload = loadQuiz;
+</script>
+</body>
+</html>

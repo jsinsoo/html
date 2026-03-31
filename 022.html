@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정보 2-2. 디지털 데이터의 압축 퀴즈</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; max-width: 800px; margin: 20px auto; padding: 20px; background-color: #f4f7f6; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .input-group { margin-bottom: 20px; text-align: center; }
+        .input-group input { padding: 8px; margin: 0 5px; border: 1px solid #ddd; border-radius: 4px; }
+        .question { margin-bottom: 25px; padding: 15px; border-left: 5px solid #3498db; background: #fafafa; }
+        .options { list-style: none; padding-left: 0; }
+        .options li { margin-bottom: 8px; }
+        .btn-submit { display: block; width: 100%; padding: 15px; background: #3498db; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; transition: background 0.3s; }
+        .btn-submit:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>2-2. 디지털 데이터의 압축 퀴즈</h1>
+    
+    <div class="input-group">
+        학번: <input type="text" id="studentId" placeholder="예: 20101">
+        이름: <input type="text" id="studentName" placeholder="홍길동">
+    </div>
+
+    <div id="quiz"></div>
+    <button class="btn-submit" onclick="submitQuiz()">제출 및 결과 파일 생성</button>
+</div>
+
+<script>
+const quizData = [
+    { q: "디지털 데이터 압축의 정의로 가장 적절한 것은?", a: 2, c: ["데이터의 품질을 무조건 높이는 기술", "전체 비트 수를 줄여서 정보를 다시 표현하는 기술", "데이터에 암호를 걸어 보호하는 기술", "데이터를 삭제하여 영구히 없애는 기술", "데이터의 전송 속도를 늦추는 기술"], e: "디지털 데이터의 압축은 원본 데이터를 보다 작은 크기로 변환하여 전체 비트 수를 줄여서 정보를 다시 표현하는 기술입니다 [1]." },
+    { q: "디지털 데이터를 압축하는 주된 이유가 아닌 것은?", a: 5, c: ["전송 속도 향상", "네트워크 대역폭 절약", "저장 공간 절약", "데이터 보존(무손실의 경우)", "데이터의 익명성 보장"], e: "압축은 전송 속도 향상, 대역폭 및 저장 공간 절약, 데이터 보존 등을 위해 사용됩니다 [1, 2]." },
+    { q: "손실 압축 방식에 대한 설명으로 옳은 것은?", a: 1, c: ["중요 정보는 보존하면서 일부 데이터를 제거하여 용량을 줄인다.", "원본 데이터의 모든 정보를 완벽하게 보존한다.", "압축을 해제하면 항상 원본과 100% 동일한 데이터가 된다.", "압축 효율이 무손실 압축에 비해 상대적으로 낮다.", "주로 문서나 실행 파일 압축에 사용된다."], e: "손실 압축은 품질을 낮추어 일부 데이터를 제거함으로써 파일 용량을 비교적 크게 줄이는 방식입니다 [3]." },
+    { q: "무손실 압축의 특징으로 옳은 것은?", a: 4, c: ["압축률이 매우 높다.", "일부 데이터를 영구적으로 삭제한다.", "복원된 데이터의 질이 원본보다 낮다.", "원본 데이터의 손실 없이 원본으로 복원이 가능하다.", "사람의 눈으로 확인하기 힘든 부분을 제거한다."], e: "무손실 압축은 원본 데이터의 손상이 없으며, 원본 데이터로 복원이 가능하다는 특징이 있습니다 [3]." },
+    { q: "다음 중 문자 데이터 압축 방법이 아닌 것은?", a: 3, c: ["ZIP", "반복 길이 압축(RLE)", "MPEG", "허프만 압축", "긴 코드를 짧은 코드로 대체"], e: "ZIP, RLE, 허프만 등은 문자 압축 방식이며, MPEG은 동영상 압축 방식입니다 [4-6]." },
+    { q: "반복 길이 압축(RLE)으로 'AAAABBCCC'를 압축한 결과는?", a: 1, c: ["A4B2C3", "ABC9", "A1B1C1", "A3B2C3", "4A2B3C"], e: "반복 길이 압축은 동일한 문자가 연속되는 부분을 '문자x반복 횟수'로 표현합니다 [4]." },
+    { q: "허프만 압축의 기본 원리로 옳은 것은?", a: 2, c: ["모든 문자에 동일한 비트 수를 할당한다.", "발생 빈도가 높은 문자에 적은 비트를 할당한다.", "문자의 순서를 무작위로 섞는다.", "발생 빈도가 낮은 문자에 적은 비트를 할당한다.", "모든 데이터를 8비트로 고정한다."], e: "허프만 압축은 빈도가 높은 문자에는 비트 수를 적게, 낮은 문자에는 많이 할당하여 전체 데이터양을 줄입니다 [4, 7]." },
+    { q: "허프만 트리에서 빈도수가 높은 문자의 위치는?", a: 1, c: ["트리의 상위 레벨", "트리의 하위 레벨", "항상 왼쪽 끝 노드", "항상 오른쪽 끝 노드", "상관없음"], e: "빈도수가 높은 문자는 트리의 상위 레벨에 배치하여 비트 수를 줄입니다 [7]." },
+    { q: "GIF 이미지 형식의 특징으로 옳은 것은?", a: 4, c: ["손실 압축 방식이다.", "1,677만 가지 색상을 표현한다.", "투명도 조절이 불가능하다.", "최대 256색으로 제한되며 애니메이션을 지원한다.", "압축률이 JPEG보다 항상 우수하다."], e: "GIF는 무손실 압축 방식이지만 색상이 256색으로 제한되며, 애니메이션 이미지로 사용 가능합니다 [8, 9]." },
+    { q: "PNG 이미지 형식에 대한 설명으로 옳은 것은?", a: 3, c: ["손실 압축 방식의 표준이다.", "최대 256색만 표현 가능하다.", "24비트 트루 컬러를 표현할 수 있는 무손실 방식이다.", "압축 성능이 JPEG보다 월등히 높다.", "동영상 압축에 주로 사용된다."], e: "PNG는 무손실 압축 방식으로, 24비트 값을 사용하여 트루 컬러까지 표현할 수 있습니다 [9]." },
+    { q: "JPEG(JPG)에 대한 설명으로 옳지 않은 것은?", a: 5, c: ["손실 이미지 압축 방식이다.", "압축률과 영상 품질을 지정할 수 있다.", "국제 표준 압축 방식이다.", "픽셀 색상 정보를 변환하여 용량을 줄인다.", "문서 파일 압축에 가장 적합한 방식이다."], e: "JPEG은 이미지 손실 압축 방식의 국제 표준이며, 주로 멀티미디어 데이터에 적합합니다 [6, 9, 10]." },
+    { q: "트루 컬러(True Color)는 몇 비트 값을 사용하여 색상을 표현하는가?", a: 3, c: ["8비트", "16비트", "24비트", "32비트", "64비트"], e: "트루 컬러는 24비트 값을 사용하여 16,777,216가지 색상을 표현합니다 [11]." },
+    { q: "MP3 소리 데이터 압축의 특징으로 옳은 것은?", a: 2, c: ["무손실 압축 방식이다.", "사람의 귀로 감지할 수 없는 주파수 대역을 제거한다.", "원본 오디오와 동일한 품질을 100% 유지한다.", "압축 후 파일 크기가 거의 줄어들지 않는다.", "모든 주파수 대역을 균등하게 보존한다."], e: "MP3는 손실 압축 방식으로, 사람이 감지할 수 없는 주파수 대역과 중복 데이터를 제거합니다 [12]." },
+    { q: "FLAC 소리 데이터 압축 방식의 특징은?", a: 1, c: ["무손실 압축으로 원본과 동일한 품질을 유지한다.", "손실 압축으로 용량을 최대화한다.", "주로 영상 변화량을 저장한다.", "색상 정보를 256색으로 줄인다.", "주파수 대역을 일부 손실하며 저장한다."], e: "FLAC는 무손실 압축 방식으로, 원본 오디오 데이터를 압축하면서도 동일한 품질을 유지합니다 [12]." },
+    { q: "동영상 데이터 압축(MPEG)의 원리로 옳은 것은?", a: 4, c: ["모든 프레임을 독립적인 PNG로 저장한다.", "모든 픽셀을 무손실로 보존한다.", "소리 데이터만 압축하고 영상은 그대로 둔다.", "이전 장면과 차이가 생기는 변화량만을 저장한다.", "프레임 수를 2배로 늘린다."], e: "동영상 압축은 연속된 이미지 중 움직임이 생겨 이전 장면과 차이가 생기는 변화만을 저장합니다 [5]." },
+    { q: "압축률을 구하는 공식으로 옳은 것은?", a: 1, c: ["(원본 크기 - 압축 크기) / 원본 크기", "압축 크기 / 원본 크기", "(원본 크기 + 압축 크기) / 원본 크기", "원본 크기 / 압축 크기", "원본 크기 - 압축 크기"], e: "압축률은 (원본 데이터 크기 – 압축된 데이터 크기) / 원본 데이터 크기로 계산합니다 [13, 14]." },
+    { q: "반복 길이 압축(RLE) 시 압축률이 음수가 나오는 경우의 원인은?", a: 2, c: ["압축이 너무 잘 되었을 때", "데이터의 반복이 적어 압축 후 크기가 더 커졌을 때", "원본 데이터 용량이 너무 클 때", "이미지 데이터를 무손실 압축했을 때", "특수 문자를 포함했을 때"], e: "문자가 반복되지 않고 계속 바뀔 경우, 반복 횟수 정보가 추가되어 오히려 압축 후 크기가 더 커질 수 있습니다 [15]." },
+    { q: "디지털 탄소 발자국을 줄이기 위해 쉽게 실천할 수 있는 방법은?", a: 3, c: ["파일을 무조건 크게 만들기", "고화질 영상만 시청하기", "불필요한 메일함 비우기", "절전 모드 해제하기", "화면 밝기를 최대로 설정하기"], e: "불필요한 메일 삭제 등 정보 저장 과정에서의 에너지 소비를 줄임으로써 디지털 탄소 발자국을 줄일 수 있습니다 [16, 17]." },
+    { q: "디지털 기기 활동으로 발생하는 탄소가 2040년 전체 탄소 발자국의 몇 % 이상을 차지할 것으로 예상되는가?", a: 4, c: ["5% 이상", "8% 이상", "11% 이상", "14% 이상", "20% 이상"], e: "2040년까지 디지털 탄소 발자국이 전체의 14% 이상을 차지할 것으로 예상됩니다 [17]." },
+    { q: "데이터 유형에 따라 적절한 압축 코덱을 선택하는 이유로 가장 적절한 것은?", a: 2, c: ["용량을 늘리기 위해", "무결성과 품질을 유지하면서 파일 크기를 줄이기 위해", "전송 속도를 늦추기 위해", "원본 데이터를 완전히 삭제하기 위해", "암호화만을 수행하기 위해"], e: "코덱은 무결성과 품질을 유지하면서 데이터 파일 크기를 줄여 저장 및 전송을 쉽게 하기 위해 사용됩니다 [5]." }
+];
+
+function renderQuiz() {
+    const quizContainer = document.getElementById('quiz');
+    quizData.forEach((item, index) => {
+        let html = `<div class="question">
+            <p><strong>Q${index + 1}. ${item.q}</strong></p>
+            <ul class="options">`;
+        item.c.forEach((choice, i) => {
+            html += `<li><label><input type="radio" name="q${index}" value="${i + 1}"> ${i + 1}) ${choice}</label></li>`;
+        });
+        html += `</ul></div>`;
+        quizContainer.innerHTML += html;
+    });
+}
+
+function submitQuiz() {
+    const studentId = document.getElementById('studentId').value;
+    const studentName = document.getElementById('studentName').value;
+    if (!studentId || !studentName) {
+        alert("학번과 이름을 입력해주세요.");
+        return;
+    }
+
+    let score = 0;
+    let resultText = `학번: ${studentId}\n이름: ${studentName}\n`;
+    resultText += `--------------------------------------\n`;
+    resultText += `[문항별 상세 결과]\n\n`;
+
+    quizData.forEach((item, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        const userAnswer = selected ? parseInt(selected.value) : 0;
+        const isCorrect = userAnswer === item.a;
+        if (isCorrect) score += 5;
+
+        resultText += `Q${index + 1}: ${isCorrect ? 'O (정답)' : 'X (오답)'}\n`;
+        resultText += ` - 학생 답: ${userAnswer === 0 ? '미응시' : userAnswer}\n`;
+        resultText += ` - 정답: ${item.a}\n`;
+        resultText += ` - 상세 풀이: ${item.e}\n\n`;
+    });
+
+    const totalScore = score;
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    const finalContent = `=== 퀴즈 결과 보고서 ===\n최종 점수: ${totalScore}점 / 100점\n\n` + resultText;
+    
+    // 파일 다운로드 실행
+    const filename = `${studentId}_${studentName}_${totalScore}점_2-2단원_${timeStr}.txt`;
+    const blob = new Blob([finalContent], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    
+    alert(`제출 완료! 점수: ${totalScore}점\n결과 파일(${filename})이 생성되었습니다.`);
+}
+
+renderQuiz();
+</script>
+
+</body>
+</html>

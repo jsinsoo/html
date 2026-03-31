@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정보 2-3. 빅데이터와 데이터 수집 퀴즈</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; max-width: 900px; margin: 20px auto; padding: 20px; background-color: #f0f4f8; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 3px solid #4a90e2; padding-bottom: 15px; }
+        .info-section { background: #eef2f7; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center; }
+        .info-section input { padding: 10px; margin: 5px; border: 1px solid #cbd5e0; border-radius: 4px; width: 150px; }
+        .question-card { margin-bottom: 30px; padding: 20px; border: 1px solid #e1e8ed; border-radius: 8px; background: #fff; transition: transform 0.2s; }
+        .question-card:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .q-text { font-weight: bold; font-size: 1.1em; color: #34495e; margin-bottom: 15px; }
+        .options { list-style: none; padding: 0; }
+        .options li { margin: 10px 0; padding: 8px; border-radius: 4px; background: #f9f9f9; }
+        .options label { cursor: pointer; display: block; width: 100%; }
+        .btn-submit { display: block; width: 100%; padding: 18px; background: #4a90e2; color: white; border: none; border-radius: 6px; font-size: 20px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        .btn-submit:hover { background: #357abd; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>2-3. 빅데이터와 데이터 수집 퀴즈</h1>
+    
+    <div class="info-section">
+        <strong>학번:</strong> <input type="text" id="studentId" placeholder="예: 20301">
+        <strong>이름:</strong> <input type="text" id="studentName" placeholder="홍길동">
+    </div>
+
+    <div id="quiz-container"></div>
+    
+    <button class="btn-submit" onclick="processQuiz()">제출 및 결과 파일(.txt) 저장</button>
+</div>
+
+<script>
+const quizData = [
+    { q: "빅데이터의 개념에 대한 설명으로 옳은 것은?", a: 4, c: ["단순히 저장 용량이 1TB 이상인 데이터만을 의미한다.", "기존의 데이터베이스 관리 도구로도 충분히 관리가 가능한 규모이다.", "데이터의 수집보다는 데이터의 삭제 기술에 더 집중한다.", "대량의 데이터 집합에서 가치를 추출하고 분석하는 기술을 포함한다.", "정형 데이터만을 수집하여 분석하는 한정적인 개념이다."], e: "빅데이터는 기존 도구로 관리하기 어려운 규모와 다양성을 가진 데이터이며, 가치를 추출하고 분석하는 기술을 뜻하기도 합니다. [1]" },
+    { q: "다음 중 빅데이터의 핵심 특징인 '3V'에 해당하지 않는 것은?", a: 5, c: ["Volume (규모/용량)", "Velocity (속도)", "Variety (다양성)", "의사 결정에 도움을 주는 가치 창출", "Virtual (가상성)"], e: "빅데이터의 3V는 Volume, Velocity, Variety입니다. [2]" },
+    { q: "표와 같이 구조화되어 데이터 속성과 값이 명확히 구분된 데이터는?", a: 1, c: ["정형 데이터", "비정형 데이터", "로그 데이터", "반정형 데이터", "멀티미디어 데이터"], e: "구조화된 데이터로 속성과 값이 구분 정리된 데이터는 정형 데이터입니다. [1]" },
+    { q: "이미지, 영상, 사운드 등 형태가 불규칙한 데이터를 무엇이라 하는가?", a: 2, c: ["정형 데이터", "비정형 데이터", "시스템 데이터", "데이터 댐", "API 데이터"], e: "이미지, 비디오, 텍스트 등 형태가 불규칙한 데이터는 비정형 데이터입니다. [1]" },
+    { q: "빅데이터의 3V에 '정확성'과 '가치'를 추가하여 부르는 용어는?", a: 3, c: ["4V", "AI 데이터", "5V", "빅데이터 플러스", "데이터 과학"], e: "3V에 Veracity(정확성)와 Value(가치)를 추가하여 5V로 나타내기도 합니다. [2]" },
+    { q: "여러 곳에서 생산되는 데이터를 수집·가공하여 공급하는 시스템을 비유하는 말은?", a: 2, c: ["데이터 터널", "데이터 댐", "데이터 하천", "데이터 창고", "데이터 클라우드"], e: "데이터 댐은 데이터를 수집, 가공해서 공급하는 시스템을 의미합니다. [3]" },
+    { q: "컴퓨터 공학, 수학, 통계학이 융합되어 데이터 속 패턴을 찾는 분야는?", a: 5, c: ["기계 학습", "데이터 마이닝", "클라우드 컴퓨팅", "정보 통신", "데이터 과학"], e: "다양한 데이터 속 담긴 패턴을 찾아내고 진단·예측하는 분야는 데이터 과학입니다. [4]" },
+    { q: "아마존(Amazon)의 빅데이터 활용 사례로 가장 적절한 것은?", a: 1, c: ["구매 버튼 클릭 전 미리 배송 준비를 하는 시스템", "실시간 전력 소비량을 분석하여 전기료 절감", "대중교통 노선 배차 간격 조정", "선수의 경기 성적 예측 및 관리", "작물의 생산성 향상을 위한 기후 분석"], e: "아마존은 소비 패턴을 분석해 배송 요청 전 미리 준비하는 시스템을 마련했습니다. [5]" },
+    { q: "패션 브랜드 자라(ZARA)에서 실시간 재고 파악을 위해 사용하는 기술은?", a: 4, c: ["QR 코드", "바코드", "블록체인", "RFID 태그", "마그네틱 인식"], e: "자라는 옷에 RFID 태그를 부착하여 고객의 반응을 당일 파악하고 재고를 관리합니다. [5]" },
+    { q: "데이터를 활용한 문제 해결 과정 중 세 번째 단계는?", a: 3, c: ["문제 정의", "문제 상황 이해", "데이터 수집 및 전처리", "데이터 시각화 및 해석", "공유 및 평가"], e: "과정은 이해 -> 정의 -> 수집 및 전처리 -> 시각화 및 해석 -> 공유 및 평가 순입니다. [6]" },
+    { q: "데이터 품질 향상을 위해 데이터를 정제하고 변환하는 과정은?", a: 2, c: ["데이터 수집", "데이터 전처리", "데이터 시각화", "데이터 저장", "데이터 모델링"], e: "데이터 품질을 높이기 위해 정제 및 변환하는 과정을 데이터 전처리라고 합니다. [7]" },
+    { q: "측정되지 않은 시기나 설문 응답 누락으로 값이 없는 상태를 뜻하는 용어는?", a: 1, c: ["결측치", "이상치", "중복치", "오차값", "누락치"], e: "데이터에 값이 누락된 것을 결측치라고 합니다. [8]" },
+    { q: "일반적인 데이터 범위에서 크게 벗어나 아주 작거나 큰 값을 가지는 데이터는?", a: 2, c: ["평균치", "이상치", "분산치", "오류값", "표준치"], e: "범위에서 크게 벗어나 아주 작거나 큰 값을 가지는 데이터는 이상치입니다. [8]" },
+    { q: "공공 기관이 생성·관리하며 국민에게 개방하는 전자적 데이터는?", a: 3, c: ["민간 데이터", "기업 비밀 데이터", "공공 데이터", "개인 정보 데이터", "유료 통계 데이터"], e: "공공 기관이 생성 또는 취득하여 관리하는 데이터는 공공 데이터입니다. [9]" },
+    { q: "다른 소프트웨어와 상호 작용하기 위한 일련의 규칙과 명세를 뜻하는 용어는?", a: 4, c: ["HTML", "HTTPS", "DNS", "API", "URL"], e: "소프트웨어 간 상호 작용을 위한 규칙과 명세는 API라고 합니다. [10]" },
+    { q: "다음 중 대한민국 공공 데이터를 검색하고 다운로드할 수 있는 대표 포털은?", a: 1, c: ["공공데이터포털(data.go.kr)", "네이버 데이터랩", "구글 트렌드", "캐글(Kaggle)", "레딧(Reddit)"], e: "대표적인 공공 데이터 제공처는 공공데이터포털(www.data.go.kr)입니다. [9]" },
+    { q: "데이터 수집 시 반드시 고려해야 할 윤리적 문제 두 가지는?", a: 5, c: ["데이터 크기와 속도", "데이터 색상과 모양", "데이터의 가격과 희소성", "데이터의 저장 방식과 용량", "개인 정보 보호와 저작권 침해"], e: "데이터 수집 시 개인 정보 포함 여부와 저작권 침해 여부를 고려해야 합니다. [11]" },
+    { q: "인구, 물가, GDP 등 국내외 주요 통계 데이터를 제공하는 곳은?", a: 3, c: ["행정안전부", "교통사고 분석 시스템", "국가통계포털(KOSIS)", "서울 열린 데이터 광장", "보건의료 빅데이터 개방시스템"], e: "인구, 경제 등 주요 통계는 국가통계포털(kosis.kr)에서 제공합니다. [9]" },
+    { q: "설문 데이터에서 특정 조건(예: 티셔츠 사이즈 110)만 골라내는 기능은?", a: 2, c: ["정렬(Sort)", "필터(Filter)", "합계(Sum)", "조건부 서식", "데이터 시각화"], e: "특정 조건에 맞는 데이터만 확인하려면 필터 기능을 사용합니다. [12]" },
+    { q: "데이터의 성질이나 특성을 말하며, 이름, 학번 등을 예로 들 수 있는 용어는?", a: 4, c: ["데이터 값", "데이터 형식", "데이터 크기", "데이터 속성", "데이터 라벨"], e: "데이터의 특성이며 다른 것과 구별되는 성질을 데이터 속성이라고 합니다. [7]" }
+];
+
+function loadQuiz() {
+    const container = document.getElementById('quiz-container');
+    quizData.forEach((item, idx) => {
+        let optionsHtml = '';
+        item.c.forEach((choice, i) => {
+            optionsHtml += `<li><label><input type="radio" name="q${idx}" value="${i + 1}"> ${i + 1}) ${choice}</label></li>`;
+        });
+        container.innerHTML += `
+            <div class="question-card">
+                <p class="q-text">Q${idx + 1}. ${item.q}</p>
+                <ul class="options">${optionsHtml}</ul>
+            </div>`;
+    });
+}
+
+function processQuiz() {
+    const sId = document.getElementById('studentId').value.trim();
+    const sName = document.getElementById('studentName').value.trim();
+    
+    if (!sId || !sName) {
+        alert("학번과 이름을 입력해주세요.");
+        return;
+    }
+
+    let score = 0;
+    let report = `=== 2-3. 빅데이터와 데이터 수집 퀴즈 결과 ===\n`;
+    report += `학번: ${sId} / 이름: ${sName}\n`;
+    report += `------------------------------------------\n\n`;
+
+    quizData.forEach((item, idx) => {
+        const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+        const userAns = selected ? parseInt(selected.value) : 0;
+        const correct = userAns === item.a;
+        if (correct) score += 5;
+
+        report += `Q${idx + 1}. ${correct ? '[O] 정답' : '[X] 오답'}\n`;
+        report += ` - 선택한 답: ${userAns === 0 ? '미응시' : userAns}\n`;
+        report += ` - 정답: ${item.a}\n`;
+        report += ` - 해설: ${item.e}\n\n`;
+    });
+
+    const totalScore = score;
+    report = `최종 점수: ${totalScore}점 / 100점\n\n` + report;
+
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    const fileName = `${sId}_${sName}_${totalScore}점_2-3단원_${timeStr}.txt`;
+    
+    const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+
+    alert(`제출되었습니다!\n점수: ${totalScore}점\n결과 파일(${fileName})을 확인하세요.`);
+}
+
+window.onload = loadQuiz;
+</script>
+</body>
+</html>

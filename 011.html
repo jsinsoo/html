@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정보 1-1. 네트워크 환경 구성 퀴즈</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 20px auto; padding: 20px; background-color: #f4f4f4; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        .input-group { margin-bottom: 20px; padding: 15px; background: #e8f4fd; border-radius: 5px; }
+        .question { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .question p { font-weight: bold; }
+        .options { list-style: none; padding: 0; }
+        .options li { margin: 5px 0; }
+        button { display: block; width: 100%; padding: 15px; background: #3498db; color: white; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; }
+        button:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>1-1. 네트워크 환경 구성 퀴즈</h1>
+    
+    <div class="input-group">
+        학번: <input type="text" id="studentId" placeholder="예: 10101"> 
+        이름: <input type="text" id="studentName" placeholder="예: 홍길동">
+    </div>
+
+    <div id="quiz-container">
+        <!-- 퀴즈 문항 20개 -->
+    </div>
+
+    <button onclick="submitQuiz()">제출 및 결과 파일 다운로드</button>
+</div>
+
+<script>
+    const questions = [
+        { q: "컴퓨팅 시스템에서 기기들이 데이터를 주고받을 수 있도록 구성된 통신망을 무엇이라 하는가?", a: 2, options: ["프로토콜", "네트워크", "이더넷", "게이트웨이", "서브넷"], exp: "네트워크는 기기들이 데이터를 주고받을 수 있도록 구성된 통신망을 의미합니다. [1]" },
+        { q: "송신자와 수신자 간에 데이터를 주고받기 위한 규약이나 약속을 의미하는 용어는?", a: 4, options: ["인터넷", "LAN", "IP 주소", "프로토콜", "도메인"], exp: "프로토콜은 송수신자 간 데이터 전송 방식에 대한 약속입니다. [2]" },
+        { q: "유선 네트워크의 특징으로 옳지 않은 것은?", a: 3, options: ["통신 안정성이 높다.", "구축 비용이 많이 발생할 수 있다.", "자리를 이동하며 사용하기 편리하다.", "랜 케이블, 광섬유 등을 사용한다.", "이더넷 방식을 주로 따른다."], exp: "유선 네트워크는 자리를 이동하며 사용하기 어렵다는 단점이 있습니다. [3]" },
+        { q: "근거리에 위치한 기기 간 통신을 가능하게 하는 네트워크 기술로, 유선 환경에서 주로 쓰이는 방식은?", a: 1, options: ["이더넷(Ethernet)", "블루투스", "와이파이", "NFC", "지그비"], exp: "일상의 대부분 유선 네트워크는 이더넷 방식을 따릅니다. [3]" },
+        { q: "중앙의 장치(HUB)를 중심으로 모든 기기가 연결된 네트워크 구성 형태는?", a: 2, options: ["버스형", "스타형", "그물형", "링형", "계층형"], exp: "스타형은 중앙 장치를 중심으로 기기들이 배치된 형태입니다. [4, 5]" },
+        { q: "무선 네트워크의 특징에 대한 설명으로 옳은 것은?", a: 5, options: ["유선 방식보다 통신 안정성이 항상 높다.", "물리적인 전송 매체가 반드시 필요하다.", "구축 비용이 유선보다 항상 많이 든다.", "장애물에 의한 전파 간섭이 전혀 없다.", "사물 인터넷(IoT) 환경에서 중요한 역할을 한다."], exp: "무선 네트워크는 사물 인터넷에서 중요한 역할을 합니다. [6]" },
+        { q: "저전력으로 데이터를 주고받기 위한 근거리 무선 정보 통신 기술은?", a: 3, options: ["와이파이", "블루투스", "지그비(ZigBee)", "셀룰러 통신", "NFC"], exp: "지그비는 저전력 근거리 무선 통신 기술입니다. [6]" },
+        { q: "블루투스 기기를 서로 연결하는 초기 인증 과정을 무엇이라 하는가?", a: 4, options: ["미러링", "태깅", "로그인", "페어링", "스캐닝"], exp: "블루투스 기기 연결의 초기 인증 과정은 페어링입니다. [7]" },
+        { q: "약 10cm 이내의 매우 가까운 거리에서 데이터를 주고받는 기술로 결제 등에 활용되는 것은?", a: 1, options: ["NFC", "RFID", "와이파이", "블루투스", "지그비"], exp: "NFC는 10cm 이내의 매우 가까운 거리에서 통신합니다. [8]" },
+        { q: "RFID 기술의 특징으로 옳은 것은?", a: 2, options: ["반드시 접촉해야 인식이 가능하다.", "한 번에 여러 개의 태그를 인식할 수 있다.", "블루투스보다 데이터 전송 속도가 빠르다.", "양방향 통신만 가능하다.", "NFC보다 가격이 저렴하다."], exp: "RFID는 비접촉식이며 한 번에 여러 태그를 인식할 수 있습니다. [9]" },
+        { q: "서비스 영역을 셀 단위로 분할하여 기지국과 통신하는 체계는?", a: 5, options: ["와이파이", "블루투스", "NFC", "RFID", "셀룰러 통신"], exp: "셀룰러 통신은 영역을 셀 단위로 나누어 기지국과 통신합니다. [10]" },
+        { q: "인터넷 접속 정보를 자동으로 할당하는 방식의 명칭은?", a: 3, options: ["DNS", "NAT", "DHCP", "IPv6", "MAC"], exp: "DHCP는 인터넷 접속 정보를 자동으로 할당하는 프로토콜입니다. [11]" },
+        { q: "현재 보편적으로 사용되며 32bit 길이를 가지는 IP 주소 체계는?", a: 1, options: ["IPv4", "IPv6", "MAC 주소", "도메인", "서브넷"], exp: "IPv4는 32bit 길이의 주소 체계입니다. [12]" },
+        { q: "IPv6에 대한 설명으로 옳은 것은?", a: 4, options: ["32bit 길이를 가진다.", "주소 부족 문제를 해결할 수 없다.", "마침표(.)로 4개 영역을 구분한다.", "보안 기능이 강화되었으며 128bit 길이다.", "현재는 IPv4를 전혀 사용하지 않는다."], exp: "IPv6는 128bit 길이며 보안이 강화되었습니다. [12]" },
+        { q: "서로 다른 네트워크가 통신하기 위해 반드시 거쳐야 하는 지점을 뜻하는 장치는?", a: 2, options: ["허브", "게이트웨이", "랜 카드", "DNS 서버", "단말기"], exp: "게이트웨이는 서로 다른 네트워크가 통신하기 위해 거치는 지점입니다. [12]" },
+        { q: "공인 IP 주소를 부여하는 주체는?", a: 3, options: ["개인 사용자", "하드웨어 제조사", "인터넷 서비스 제공 업체(ISP)", "웹 브라우저", "도메인 대행사"], exp: "공인 IP는 인터넷 서비스 제공 업체(ISP)가 부여합니다. [13]" },
+        { q: "숫자로 된 IP 주소를 'www.moe.go.kr'과 같이 문자로 변환해주는 시스템은?", a: 5, options: ["DHCP", "NAT", "IPv6", "이더넷", "DNS 서버"], exp: "DNS 서버는 IP 주소와 도메인 이름 간 변환을 담당합니다. [14]" },
+        { q: "도메인 'www.korea.kr'에서 '.kr'이 의미하는 것은?", a: 1, options: ["국가(한국)", "정부기관", "상업기관", "네트워크기관", "비영리기구"], exp: ".kr은 대한민국의 국가 도메인입니다. [15]" },
+        { q: "하드웨어 제조사가 부여하는 고유한 기기 식별 번호로 수정이 불가능한 것은?", a: 2, options: ["사설 IP", "MAC 주소", "공인 IP", "게이트웨이", "DNS 주소"], exp: "MAC 주소는 하드웨어 자체에 부여된 고유 번호입니다. [16]" },
+        { q: "공유 네트워크 구성 시 주의사항으로 가장 적절한 것은?", a: 4, options: ["모든 사용자에게 모든 권한을 부여한다.", "비밀번호는 설정하지 않는 것이 편리하다.", "공인 IP 주소를 외부인에게 공개한다.", "개인 정보나 민감 정보 포함 여부를 확인한다.", "보안 설정을 항상 해제해 둔다."], exp: "공유 시 개인 정보나 민감 정보가 포함되지 않도록 주의해야 합니다. [17]" }
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+    questions.forEach((item, index) => {
+        let qDiv = document.createElement('div');
+        qDiv.className = 'question';
+        let optionsHtml = item.options.map((opt, i) => 
+            `<li><input type="radio" name="q${index}" value="${i+1}"> ${i+1}) ${opt}</li>`
+        ).join('');
+        qDiv.innerHTML = `<p>${index + 1}. ${item.q}</p><ul class="options">${optionsHtml}</ul>`;
+        quizContainer.appendChild(qDiv);
+    });
+
+    function submitQuiz() {
+        const sId = document.getElementById('studentId').value;
+        const sName = document.getElementById('studentName').value;
+        if(!sId || !sName) { alert("학번과 이름을 입력해주세요."); return; }
+
+        let score = 0;
+        let report = `[응시 결과 정보]\n학번: ${sId}\n이름: ${sName}\n`;
+        const now = new Date();
+        const timeStr = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
+
+        questions.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            const userAns = selected ? selected.value : "미응답";
+            const isCorrect = userAns == item.a;
+            if(isCorrect) score += 5;
+            
+            report += `\n${index + 1}번 문제: ${isCorrect ? "O (정답)" : "X (오답)"}\n`;
+            report += `  - 선택한 답: ${userAns}, 실제 정답: ${item.a}\n`;
+            report += `  - 풀이: ${item.exp}\n`;
+        });
+
+        report += `\n총점: ${score} / 100\n응시시각: ${timeStr}`;
+
+        const fileName = `${sId}_${sName}_${score}_1-1단원_${now.getTime()}.txt`;
+        const blob = new Blob([report], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        
+        alert(`${sName}님, 퀴즈가 제출되었습니다.\n점수: ${score}점\n결과 파일(${fileName})을 확인하세요.`);
+    }
+</script>
+</body>
+</html>
